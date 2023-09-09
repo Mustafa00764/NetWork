@@ -73,6 +73,9 @@ class EditActivity : AppCompatActivity() {
                 })
             }
 
+            override fun onFailure(call: Call<Post>, t: Throwable) {
+                hideLoading()
+            }
         })
 
     }
