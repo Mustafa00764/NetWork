@@ -3,8 +3,10 @@ package com.example.network
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.core.widget.ContentLoadingProgressBar
 import com.example.network.data.remote.ApiClient
 import com.example.network.model.Post
@@ -40,13 +42,37 @@ class EditActivity : AppCompatActivity() {
                     post=response.body()!!
                     etTitle.setText(post.title)
                     etBody.setText(post.body)
+                    val bUpdata = findViewById<Button>(R.id.b_save)
+
+                    bUpdata.setOnClickListener {
+                        val newTitle = etTitle.text.toString()
+                        val newBody = etBody.text.toString()
+                        post.body=newBody
+                        post.title=newTitle
+                        updataPost(post)
+                    }
                 }
                 hideLoading()
             }
 
-            override fun onFailure(call: Call<Post>, t: Throwable) {
-                hideLoading()
+            private fun updataPost(post: Post) {
+                showLoading()
+                ApiClient.apiSevice.updatePost(post.id,post).enqueue(object :Callback<Post>{
+                    override fun onResponse(call: Call<Post>, response: Response<Post>) {
+                        hideLoading()
+                        if (response.isSuccessful){
+                            Toast.makeText(this@EditActivity,"post updated",Toast.LENGTH_SHORT).show()
+                            finish()
+
+                        }
+                    }
+
+                    override fun onFailure(call: Call<Post>, t: Throwable) {
+                        hideLoading()
+                    }
+                })
             }
+
         })
 
     }
